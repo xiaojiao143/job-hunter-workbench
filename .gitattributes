@@ -1,0 +1,30 @@
+# ============================================================
+# 换行符策略 —— **强制 LF，全部文本文件都不转换**
+# ============================================================
+# 为什么必须有这个文件：
+#   项目里有大量测试断言用「精确匹配换行」的正则，例如
+#     /if\s+basename\.startswith\(\('_'\,\s*'\.'\)\):\s*\n\s*return .../
+#     /def build_cmd_crawl\([\s\S]*?\n(?=\ndef )/
+#   只要换行从 LF 变成 CRLF，这些断言就会静默失配 → 在别人的机器上
+#   （Windows 默认 core.autocrlf=true）clone 下来一片红，而作者本地全绿。
+#
+#   实测：本地 server.py 有 0 个 CR，git clone 出来有 3,070 个 CR，
+#   直接导致「能定位到 build_cmd_crawl 函数体」失败。
+#
+#   ⇒ 统一 `eol=lf`，让任何平台 clone 出来的字节都与仓库一致。
+
+* text=auto eol=lf
+
+# 以下是二进制，绝不能被当文本转换
+*.ico binary
+*.png binary
+*.jpg binary
+*.xlsx binary
+*.pdf binary
+*.exe binary
+
+# Windows 批处理/VBS 需要 CRLF 才能被 cmd.exe / wscript 正确执行
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.vbs  text eol=crlf
+*.ps1  text eol=crlf
