@@ -157,7 +157,7 @@ def main():
         log('【出包后仍需手工】')
         log('  1) 验证包内前端：pyi-archive_viewer -l -r -b "%s"' % exe)
         log('  2) 更新 payload/：cp 到 _打包工程/payload/求职猎手工作台.exe（旧版留 .旧_日期）')
-        log('  3) 更新用户侧：cp 到 <工作台目录>/（先关掉在跑的程序）')
+        log('  3) 更新用户侧：cp 到 C:/Users/1/求职猎手工作台/（先关掉在跑的程序）')
     else:
         log('  ! 未找到预期产物 %s，请检查 spec 的 name 字段' % exe)
     return 0
