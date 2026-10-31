@@ -7965,9 +7965,27 @@ withFetch(
     {
       const vcJs2 = fs.readFileSync(path.join(DIR, 'js', 'view-collect.js'), 'utf8');
       const srv2 = fs.readFileSync(path.join(DIR, '采集器', 'server.py'), 'utf8');
-      const SK2 = 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/';
-      const crawlerPy = fs.readFileSync(SK2 + 'crawler.py', 'utf8');
-      const cliPy = fs.readFileSync(SK2 + 'cli.py', 'utf8');
+      /* ⛔ 爬虫源码的位置不能写死本机绝对路径（那会让别人 clone 下来必然红）。
+         优先用仓库内自带的 `_打包工程/crawler_src/scripts/boss_crawler/`
+         （它随仓库分发，是 crawl 链路的真实来源）；
+         找不到才回退到历史的本机 skill 目录（老环境仍可用）。 */
+      const SK2 = (function () {
+        const cands = [];
+        if (PACK_DIR) cands.push(path.join(PACK_DIR, 'crawler_src', 'scripts', 'boss_crawler') + path.sep);
+        cands.push('C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/');
+        for (let i = 0; i < cands.length; i++) {
+          if (fs.existsSync(path.join(cands[i], 'crawler.py'))) return cands[i];
+        }
+        return cands[cands.length - 1];
+      })();
+      /* 爬虫源码若两处都找不到（极端裁剪的 clone），这一节的爬虫侧断言降级为
+         「跳过并说明」，而不是抛异常把后面所有断言一起吞掉。 */
+      const hasCrawlerSrc = fs.existsSync(path.join(SK2, 'crawler.py')) &&
+                            fs.existsSync(path.join(SK2, 'cli.py'));
+      const crawlerPy = hasCrawlerSrc ? fs.readFileSync(path.join(SK2, 'crawler.py'), 'utf8') : '';
+      const cliPy = hasCrawlerSrc ? fs.readFileSync(path.join(SK2, 'cli.py'), 'utf8') : '';
+      ok('能定位到爬虫源码（crawler.py / cli.py）', hasCrawlerSrc,
+        hasCrawlerSrc ? SK2 : '两处都没找到：' + SK2);
 
       /* ---------- ① 前端：payload 里必须带 expectJobs，且**原样透传** ---------- */
       const crawlReq = vcJs2.match(/req\('\/api\/crawl',\s*\{([\s\S]*?)\n    \}\)/);
@@ -8004,7 +8022,10 @@ withFetch(
       ok('⛔ 用 store_true 语义（不带值），不拼出 `--include-known <值>` 这种怪参数',
         !/put\('--include-known'/.test(srv2) && !/put_or_blank\('--include-known'/.test(srv2));
 
-      /* ---------- ③ 爬虫：方向加权 + 透传链完整 ---------- */
+      /* ---------- ③ 爬虫：方向加权 + 透传链完整 ----------
+         ⚠️ 爬虫源码找不到时这些**跳过**（上面已有一条专门的红/绿断言说明原因），
+            不能让十几条连带失败把真正的失败点淹没。 */
+      if (hasCrawlerSrc) {
       ok('detail_priority 多了可选的 prefer 参数（默认 None → 旧行为）',
         /def detail_priority\(row, prefer=None\):/.test(crawlerPy));
       ok('⛔ 命中方向词加的是 +10（必须压过原有五个信号的满分 9）',
@@ -8031,6 +8052,7 @@ withFetch(
         /_expand_arg\(getattr\(args,\s*'detail_prefer',\s*None\)\)/.test(crawlerPy));
       ok('⛔ 爬虫按 include_known 置空全局已知集（known=None 短路 = 重采历史岗位）',
         /known\s*=\s*None\s+if\s+include_known\s+else\s+known_links\.load\(ASSETS_DIR\)/.test(crawlerPy));
+      }   /* end if (hasCrawlerSrc) */
 
       /* ---------- ④ UI 文案：说准"优先期望岗位"，不留空头承诺 ---------- */
       ok('⛔ 频次行说明详情额度**优先给期望岗位**（这才让"接着补"成立）',
