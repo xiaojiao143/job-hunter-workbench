@@ -23,8 +23,12 @@
 *.pdf binary
 *.exe binary
 
-# Windows 批处理/VBS 需要 CRLF 才能被 cmd.exe / wscript 正确执行
-*.cmd  text eol=crlf
-*.bat  text eol=crlf
-*.vbs  text eol=crlf
-*.ps1  text eol=crlf
+# ⛔ .vbs 必须按**二进制**处理。
+#   本项目三个 vbs 都是 UTF-16LE + BOM（首两字节 FFFE），且换行是混合的
+#   （CR 202/LF 178、CR 210/LF 185、CR 33/LF 216 —— 有孤立 CR）。
+#   一旦被当文本做 eol 转换，BOM 之后的字节序会被破坏，wscript 直接报语法错，
+#   而且测试里的变异锚点（精确匹配 vbs 源码）会全部失配。
+*.vbs binary
+
+# Windows 批处理需要 CRLF 才能被 cmd.exe 正确执行（但本项目 .cmd 是 UTF-8/LF，
+# 实测可正常执行，所以这里不强制，避免反而改坏它）
