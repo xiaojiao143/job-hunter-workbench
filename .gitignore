@@ -19,6 +19,16 @@ demo-data/*.local.json
 _backup_*/
 *_backup/
 
+# ---------- 打包副本：前端部分由 sync_src.py 派生，不入库 ----------
+# 这些是「源码的副本」，每次出包前由 `python sync_src.py --apply` 生成，
+# 提交它们等于把同一份代码存两遍（约 2.4MB），且容易漂移。
+# ⚠️ 手工维护的孪生文件**不在此列**，必须入库：
+#    src/server_core.py / src/launcher.py / src/browser_finder.py / src/probe_drission.py
+_打包工程/src/js/
+_打包工程/src/css/
+_打包工程/src/index.html
+_打包工程/src/favicon.ico
+
 # ---------- 构建产物 ----------
 dist_*/
 build/
