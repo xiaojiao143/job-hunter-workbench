@@ -8,7 +8,7 @@
 图标是「一次性产物」，已经随仓库提交好了；除非要改配色 / 字形，平时不用运行。
 
 运行（需要 Pillow，用采集器的虚拟环境即可 —— 那里装了 Pillow）：
-  "python" _生成图标.py
+  "C:\\Users\\1\\.workbuddy\\binaries\\python\\envs\\boss-crawler\\Scripts\\python.exe" _生成图标.py
 """
 import os
 import sys
@@ -60,7 +60,7 @@ def main():
     except ImportError:
         sys.stderr.write(
             "需要 Pillow。请用采集器的虚拟环境运行：\n"
-            '  "python" '
+            '  "C:\\Users\\1\\.workbuddy\\binaries\\python\\envs\\boss-crawler\\Scripts\\python.exe" '
             + os.path.basename(__file__) + "\n")
         return 2
 

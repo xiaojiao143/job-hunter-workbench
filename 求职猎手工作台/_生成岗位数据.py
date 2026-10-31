@@ -23,7 +23,7 @@ import os
 import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC_TREE = '%BOSS_CRAWLER_DIR%/assets/post_data.json'
+SRC_TREE = 'C:/Users/1/.workbuddy/skills/boss-crawler/assets/post_data.json'
 SRC_XLSX_GLOB = os.path.join(HERE, '数据源', 'BOSS岗位名称统计_*.xlsx')
 OUT = os.path.join(HERE, 'js', 'job-taxonomy.js')
 
