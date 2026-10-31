@@ -4,10 +4,10 @@
 >
 > **数据只存在你自己的浏览器里**（localStorage），没有账号、没有云端、没有上传。
 
-[![test](https://github.com/xiaojiao143/job-hunter-workbench/actions/workflows/test.yml/badge.svg)](../../actions)
+[![test](https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名]/actions/workflows/test.yml/badge.svg)](../../actions)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![no build](https://img.shields.io/badge/build-none-brightgreen.svg)](docs/ARCHITECTURE.md)
-[![tests](https://img.shields.io/badge/tests-2470%20assertions-success.svg)](docs/TESTING.md)
+[![tests](https://img.shields.io/badge/tests-2469%20assertions-success.svg)](docs/TESTING.md)
 
 <!-- 建议在此放一张 demo.gif（录屏见 docs/DEMO.md） -->
 <!-- ![demo](docs/demo.gif) -->
@@ -51,7 +51,7 @@
 **唯一前提：一个现代浏览器。** 不需要 Node、不需要 Python、不需要装任何东西。
 
 ```bash
-git clone https://github.com/xiaojiao143/job-hunter-workbench.git
+git clone https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名].git
 ```
 
 然后**双击** `求职猎手工作台/index.html`。
@@ -88,7 +88,7 @@ python 采集器/server.py
 | 样式 | 手写 CSS，1,529 行，`:root` 令牌体系 | 无 Tailwind，保证离线可用 |
 | 存储 | 浏览器 `localStorage` | 多账号用命名空间隔离 |
 | 后端（可选） | Python 3 标准库 HTTP 服务，3,071 行 | 无第三方 Web 框架 |
-| 测试 | Node + 自建 DOM 桩，**2,470 条断言** | 不开浏览器就能测 DOM 渲染 |
+| 测试 | Node + 自建 DOM 桩，**2,469 条断言** | 不开浏览器就能测 DOM 渲染 |
 | 变异测试 | **298 条变异锚点** | 故意改坏代码，验证测试是否变红 |
 
 ### 为什么不用框架
@@ -103,7 +103,7 @@ python 采集器/server.py
 - 没有组件复用 → 自建 `el()` DOM 工厂函数
 - 没有响应式 → 每次数据变更手动 `App.go()` 整页重画，弹窗内只就地重画
 - 没有状态管理 → 手写 `store.js`：归一白名单 + 迁移函数 + 事件订阅
-- 没有 TS 类型检查 → 用运行时断言（2,470 条测试）兜底字段契约
+- 没有 TS 类型检查 → 用运行时断言（2,469 条测试）兜底字段契约
 - 重画会丢焦点 → 自建 `[data-focus-key]` 焦点保持机制
 
 **如果重来会怎样**：如果这个项目要多人协作或长期演进，我会换成 Vite + TypeScript。**框架的价值在协作和规模，不在单人小工具**。当前选择是因为约束优先，不是因为不会用框架。
@@ -122,7 +122,7 @@ python 采集器/server.py
 │   ├── css/app.css
 │   ├── demo-data/           # 示例数据（全虚构）
 │   ├── 采集器/server.py      # 可选：本地采集服务
-│   ├── _测试_核心.js          # 2,470 条核心测试
+│   ├── _测试_核心.js          # 2,469 条核心测试
 │   ├── _回退自证.js           # 298 条变异测试
 │   └── docs/
 └── _打包工程/               # 打包为 exe 的工装（PyInstaller）
@@ -143,7 +143,7 @@ cd 求职猎手工作台
 node _测试_核心.js
 ```
 
-预期输出：`✅ 全部通过（2470 项）`
+预期输出：`✅ 全部通过（2469 项）`
 
 **这套测试的几个不常见之处**（也是我最想让面试官看的部分）：
 - **不开浏览器测 DOM**：自建 DOM 桩，把 32 个模块按 `index.html` 的顺序加载，真渲染 12 个页面

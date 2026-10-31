@@ -38,36 +38,6 @@ const PACK_TWIN = (function () {
   return path.join(DIR, '..', '_打包工程', 'src', 'server_core.py');
 })();
 
-/* 爬虫源码根目录（几十条变异打的是 crawler.py / cli.py / stages/*）。
-   ⛔ 以前这里是硬编码的 '<本机 skill 目录>'：
-      既泄漏作者本机 Windows 用户名，也让别人 clone 下来这些锚点全部失配。
-   解析顺序（与 _测试_核心.js 的 CRAWLER_DIR 口径一致）：
-     ① 环境变量 JH_CRAWLER_DIR
-     ② 仓库内自带的 _打包工程/crawler_src
-     ③ 历史本机 skill 目录（老环境兜底）
-   ⚠️ 与 PACK_TWIN 一样，找不到时也给一条确定路径，
-      让锚点预检明确报"文件不存在"，而不是静默当成已覆盖。 */
-const CRAWLER_SRC = (function () {
-  const cands = [
-    process.env.JH_CRAWLER_DIR,
-    path.join(DIR, '..', '_打包工程', 'crawler_src'),
-    path.join(DIR, '_打包工程', 'crawler_src'),
-    process.env.USERPROFILE ? path.join(process.env.USERPROFILE, '.workbuddy', 'skills', 'boss-crawler') : '',
-    process.env.HOME ? path.join(process.env.HOME, '.workbuddy', 'skills', 'boss-crawler') : '',
-  ];
-  for (let i = 0; i < cands.length; i++) {
-    const c = cands[i];
-    if (!c) continue;
-    if (fs.existsSync(path.join(c, 'scripts', 'boss_crawler'))) return c;
-  }
-  return path.join(DIR, '..', '_打包工程', 'crawler_src');
-})();
-
-/** 拼爬虫源码下的相对路径 */
-function crawlerSrc(rel) {
-  return path.join(CRAWLER_SRC, rel);
-}
-
 /**
  * 「删除」.mutbak 备份。用 renameSync 移到**项目内**的垃圾桶目录，而不是 unlinkSync ——
  * WorkBuddy 给 node 注入 safe-delete shim，unlinkSync 会被拦成「移回收站 + 批量守卫」，
@@ -1115,7 +1085,7 @@ const MUTATIONS = [
     /* 现场真事故（2026-10-06）：这个 `if` 一旦失效，浏览器断连后 crawler 就
        无限空转重试，1 分钟刷出 424MB 日志、内存和前端一起被拖死。 */
     name: 'Ⓟ 翻页滚动失败又变回无限重试（浏览器断连后空转刷屏）',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '                if scroll_fail >= SCROLL_FAIL_LIMIT:',
     to: '                if False and scroll_fail >= SCROLL_FAIL_LIMIT:',
     expect: '死循环刷屏又回来了',
@@ -1223,21 +1193,21 @@ const MUTATIONS = [
   },
   {
     name: 'Ⓔ 打招呼脚本不再限制单岗位（一次批量发出去）',
-    file: crawlerSrc('scripts/stages/boss_apply_one.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/boss_apply_one.py',
     from: '        max_applications=1,                 # 铁律：一次只发一个',
     to: '        max_applications=50,                # 铁律：一次只发一个',
     expect: '批量的口子被打开',
   },
   {
     name: 'Ⓕ 读聊天脚本读不到时就返回空数组（假装"没有新消息"，比报错更坏）',
-    file: crawlerSrc('scripts/stages/boss_chat_sync.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/boss_chat_sync.py',
     from: "            _emit({'ok': False, 'needCalibration': True, 'error':\n                   '读不到会话列表（选择器没匹配上），请先跑 --dump 校准。'})\n            return 4",
     to: "            _emit({'ok': True, 'items': []})\n            return 0",
     expect: '「我瞎了」被伪装成「你没有新消息」',
   },
   {
     name: 'Ⓖ 读聊天脚本给折不出来的时间编一个「现在」',
-    file: crawlerSrc('scripts/stages/boss_chat_sync.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/boss_chat_sync.py',
     from: '        except ValueError:\n            return None\n    return None',
     to: '        except ValueError:\n            return int(now)\n    return int(now)',
     expect: '时间被编造，新旧判断全错',
@@ -1458,14 +1428,14 @@ const MUTATIONS = [
   },
   {
     name: '【24-⑦】stage 不再专门拦 .doc（用户只拿到一句"抽不出文字"，不知道要转存）',
-    file: crawlerSrc('scripts/stages/extract_resume_text.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/extract_resume_text.py',
     from: "    if ext == '.doc':",
     to: "    if False:",
     expect: '专门拦 .doc 并提示另存为 → 没有专门提示',
   },
   {
     name: '【24-⑧】stage 的结果前缀与服务端漂移（服务端永远解析不到 payload）',
-    file: crawlerSrc('scripts/stages/extract_resume_text.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/extract_resume_text.py',
     from: "MARK = '__JH_TEXT__'",
     to: "MARK = '__JH_TXT__'",
     expect: 'MARK == 服务端认的前缀 → 漂移',
@@ -1775,7 +1745,7 @@ const MUTATIONS = [
   },
   {
     name: '【33-⑭】详情额度退回"按关键词顺序吃预算"（第一个关键词独占，其余全 0）',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '            chosen, total_pending, kept_n = select_detail_targets(\n                detail_files, detail_existing_links, detail_budget, known=known,\n                prefer=detail_prefer)',
     to: '            _fp0 = detail_files[0]\n            chosen, total_pending, kept_n = ({_fp0: [c[0] for c in collect_detail_candidates(_fp0, detail_existing_links)][:(detail_budget or 0)]}, 0, 0)',
     expect: '全局优先级分配 → 退回按文件顺序',
@@ -1819,35 +1789,35 @@ const MUTATIONS = [
   },
   {
     name: '【35-⑤】detail_priority 不加方向分（额度又按"信息完整度"分配 → 回到老 bug）',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '                score += 10',
     to: '                score += 1',
     expect: '方向命中 +10（压过信息满分 9）→ 只加 1',
   },
   {
     name: '【35-⑥】只改一个 detail_priority 调用点（另一个漏传 → 排序被后一步覆盖，静默失效）',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '                pending.append((link, detail_priority(row, prefer), order))',
     to: '                pending.append((link, detail_priority(row), order))',
     expect: '两个调用点都传 → 只传一个',
   },
   {
     name: '【35-⑦】select_detail_targets 不把 prefer 下传（全局挑选时又丢掉方向）',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '                                                          known=known, prefer=prefer):',
     to: '                                                          known=known):',
     expect: 'prefer 下传 → 不下传',
   },
   {
     name: '【35-⑧】execute_crawl_iteration 收到 detail_prefer 却不用（主循环里丢掉）',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '                detail_files, detail_existing_links, detail_budget, known=known,\n                prefer=detail_prefer)',
     to: '                detail_files, detail_existing_links, detail_budget, known=known)',
     expect: '全局分配时传 prefer → 不传',
   },
   {
     name: '【35-⑨】CLI 没定义 --detail-prefer（命令行参数被当成未知参数）',
-    file: crawlerSrc('scripts/boss_crawler/cli.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/cli.py',
     from: "    parser.add_argument('--detail-prefer', dest='detail_prefer', action='append', default=None,",
     to: "    parser.add_argument('--detail-prefer-XXX', dest='detail_prefer', action='append', default=None,",
     expect: '参数名精确为 --detail-prefer → 被改名',
@@ -2327,7 +2297,7 @@ const MUTATIONS = [
   },
   {
     name: '【45-③ 爬虫不按 include_known 置空全局已知集（known 永远加载 → 历史岗位永远被去重）】',
-    file: crawlerSrc('scripts/boss_crawler/crawler.py'),
+    file: 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/crawler.py',
     from: '    known = None if include_known else known_links.load(ASSETS_DIR)',
     to: '    known = known_links.load(ASSETS_DIR)',
     expect: 'include_known 为真时 known 必须为 None',

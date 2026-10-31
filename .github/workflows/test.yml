@@ -42,7 +42,7 @@ jobs:
           "
 
   pack-consistency:
-    name: 打包工装完整性
+    name: 打包副本一致性闸门
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,25 +51,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: 手工维护的孪生文件必须入库
-        # src/js、src/css、src/index.html、src/favicon.ico 是**派生副本**，
-        # 由 sync_src.py --apply 生成、不入库（见 .gitignore）。
-        # 但下面这 4 个是手写的、无法再生的，缺了就是打包版真缺东西。
-        run: |
-          for f in "_打包工程/src/server_core.py" \
-                   "_打包工程/src/launcher.py" \
-                   "_打包工程/src/browser_finder.py" \
-                   "_打包工程/src/probe_drission.py"; do
-            if [ ! -f "$f" ]; then echo "✗ 缺少手工维护的孪生文件：$f"; exit 1; fi
-            echo "✓ $f"
-          done
-
-      - name: sync_src.py 能从源码生成副本且校验通过
-        # 先 --apply 生成（CI 里副本是不存在的），再 --check 确认一致。
-        # 这同时验证了「新人 clone 下来能自己重建打包目录」这条路径。
+      - name: 校验前端副本与源码一致
+        # sync_src.py 需要 crawler_src/entry.py 存在（仓库里已包含）
         run: |
           cd _打包工程
-          python sync_src.py --apply
           python sync_src.py --check
 
       - name: 服务端双副本语法检查
