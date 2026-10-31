@@ -1,0 +1,195 @@
+{
+  "_comment": "示例数据（全部虚构，不含任何真实公司/HR/简历信息）。用法：工作台 → 设置 → 导入备份 → 选本文件。",
+  "_app": "求职猎手工作台",
+  "_schema": 1,
+  "_exportedAt": "2026-01-01T00:00:00.000Z",
+  "_keyRedacted": ["ai.apiKey", "bgCheck.apiKey"],
+  "settings": {
+    "ai": { "baseUrl": "https://api.deepseek.com", "apiKey": "", "model": "deepseek-chat", "collectClean": false },
+    "prefs": {
+      "direction": "前端 / 全栈",
+      "city": "杭州",
+      "salaryMin": 15,
+      "expectJobs": ["前端开发工程师", "Web前端"],
+      "dealBreakers": ["外包", "驻场"]
+    },
+    "followUp": { "waitingDays": 7, "offerDays": 3 },
+    "notify": false,
+    "notifyAhead": { "day": true, "hour2": true, "min30": true },
+    "backup": { "lastExportAt": null, "remindDays": 7, "lastRemindedAt": null },
+    "boss": { "autoGreet": false, "syncReply": false, "greetIntervalSec": 20, "greetCooldownH": 24, "lastGreetAt": 0, "browserMode": "own" }
+  },
+  "jobs": [
+    {
+      "id": "job_demo_1", "source": "manual",
+      "title": "前端开发工程师", "company": "示例科技（杭州）有限公司",
+      "industry": "互联网", "location": "杭州·西湖区", "district": "西湖区", "bizArea": "文三路",
+      "salaryText": "15-25K·14薪", "salaryMin": 15, "salaryMax": 25, "salaryMonths": 14,
+      "benefits": ["五险一金", "双休", "弹性工作"],
+      "duties": ["负责公司核心产品的 Web 前端开发", "与后端协作完成接口对接", "参与前端工程化建设"],
+      "reqDegree": "本科", "reqYears": "3-5年",
+      "reqSkills": ["JavaScript", "TypeScript", "Vue", "工程化"],
+      "keywords": ["前端", "Vue", "工程化"],
+      "rawJD": "岗位职责：\n1. 负责公司核心产品的 Web 前端开发与维护；\n2. 与后端协作完成接口对接与联调；\n3. 参与前端工程化建设，提升团队研发效率。\n\n任职要求：\n1. 本科及以上学历，3 年以上前端开发经验；\n2. 精通 JavaScript / TypeScript，熟悉 Vue 或 React；\n3. 有工程化实践（构建、CI、性能优化）者优先。\n\n福利：五险一金、双休、弹性工作。",
+      "pros": ["技术栈与个人匹配", "薪资区间符合预期"],
+      "cons": [], "tags": ["重点"], "risks": [],
+      "status": "applied", "favorite": true, "archived": false,
+      "url": "https://example.com/job/demo-1",
+      "hr": "示例HR", "hrTitle": "HRBP", "active": "刚刚活跃",
+      "createdAt": 1767225600000, "updatedAt": 1767225600000
+    },
+    {
+      "id": "job_demo_2", "source": "manual",
+      "title": "全栈开发工程师", "company": "示例网络科技有限公司",
+      "industry": "企业服务", "location": "杭州·滨江区", "district": "滨江区",
+      "salaryText": "18-30K", "salaryMin": 18, "salaryMax": 30, "salaryMonths": 12,
+      "benefits": ["五险一金", "年终奖"],
+      "duties": ["独立负责模块的前后端开发", "参与技术方案设计"],
+      "reqDegree": "本科", "reqYears": "3-5年",
+      "reqSkills": ["Node.js", "React", "MySQL"],
+      "keywords": ["全栈", "Node.js"],
+      "rawJD": "岗位职责：\n1. 独立负责业务模块的前后端开发；\n2. 参与技术方案设计与评审。\n\n任职要求：\n1. 3 年以上开发经验，熟悉 Node.js / React / MySQL；\n2. 有完整项目从 0 到 1 经验者优先。",
+      "pros": ["技术面广"], "cons": ["需要兼顾运维"], "tags": [], "risks": [],
+      "status": "interview", "favorite": false, "archived": false,
+      "url": "https://example.com/job/demo-2",
+      "hr": "示例HR2", "hrTitle": "招聘经理", "active": "今日活跃",
+      "createdAt": 1767139200000, "updatedAt": 1767312000000
+    },
+    {
+      "id": "job_demo_3", "source": "manual",
+      "title": "Web 前端工程师", "company": "示例数据服务有限公司",
+      "industry": "大数据", "location": "杭州·余杭区", "district": "余杭区",
+      "salaryText": "12-18K", "salaryMin": 12, "salaryMax": 18, "salaryMonths": 12,
+      "benefits": ["五险一金"], "duties": ["负责数据可视化前端开发"],
+      "reqDegree": "本科", "reqYears": "1-3年",
+      "reqSkills": ["JavaScript", "ECharts"],
+      "keywords": ["前端", "可视化"],
+      "rawJD": "岗位职责：\n1. 负责数据可视化相关的前端开发。\n\n任职要求：\n1. 熟悉 JavaScript，有 ECharts 使用经验。",
+      "pros": [], "cons": ["薪资偏低"], "tags": [], "risks": [],
+      "status": "todo", "favorite": false, "archived": false,
+      "url": "https://example.com/job/demo-3",
+      "hr": "示例HR3", "hrTitle": "HR", "active": "3日内活跃",
+      "createdAt": 1767052800000, "updatedAt": 1767052800000
+    },
+    {
+      "id": "job_demo_4", "source": "manual",
+      "title": "前端开发（外包驻场）", "company": "示例人力资源有限公司",
+      "industry": "人力资源", "location": "杭州·上城区", "district": "上城区",
+      "salaryText": "10-15K", "salaryMin": 10, "salaryMax": 15, "salaryMonths": 12,
+      "benefits": [], "duties": ["驻场甲方做前端开发"],
+      "reqDegree": "大专", "reqYears": "1-3年",
+      "reqSkills": ["JavaScript", "Vue"],
+      "keywords": ["前端", "外包"],
+      "rawJD": "岗位职责：\n1. 派驻甲方现场，负责前端页面开发。\n\n任职要求：\n1. 熟悉 Vue，能接受驻场。",
+      "pros": [], "cons": ["外包驻场", "无公积金"], "tags": [], "risks": ["外包"],
+      "status": "todo", "favorite": false, "archived": false,
+      "url": "https://example.com/job/demo-4",
+      "hr": "示例HR4", "hrTitle": "招聘专员", "active": "本周活跃",
+      "createdAt": 1766966400000, "updatedAt": 1766966400000
+    },
+    {
+      "id": "job_demo_5", "source": "manual",
+      "title": "高级前端工程师", "company": "示例金融信息服务有限公司",
+      "industry": "金融", "location": "杭州·江干区", "district": "江干区",
+      "salaryText": "25-40K", "salaryMin": 25, "salaryMax": 40, "salaryMonths": 15,
+      "benefits": ["五险一金", "补充医疗", "年终奖"],
+      "duties": ["负责核心交易系统前端架构", "带领 3-5 人小团队"],
+      "reqDegree": "本科", "reqYears": "5-10年",
+      "reqSkills": ["TypeScript", "React", "架构设计"],
+      "keywords": ["前端", "架构", "团队管理"],
+      "rawJD": "岗位职责：\n1. 负责核心交易系统的前端架构设计与落地；\n2. 带领 3-5 人前端小组，做技术方案评审与代码 review。\n\n任职要求：\n1. 5 年以上前端经验，2 年以上架构或带队经验；\n2. 精通 TypeScript / React，有大型项目经验。",
+      "pros": ["薪资高", "有管理机会"], "cons": ["年限要求偏高"], "tags": ["目标"], "risks": [],
+      "status": "wish", "favorite": true, "archived": false,
+      "url": "https://example.com/job/demo-5",
+      "hr": "示例HR5", "hrTitle": "技术招聘", "active": "刚刚活跃",
+      "createdAt": 1766880000000, "updatedAt": 1766880000000
+    },
+    {
+      "id": "job_demo_6", "source": "manual",
+      "title": "前端工程师（远程）", "company": "示例远程协作有限公司",
+      "industry": "SaaS", "location": "远程", "remote": true,
+      "salaryText": "20-28K", "salaryMin": 20, "salaryMax": 28, "salaryMonths": 12,
+      "benefits": ["远程办公", "弹性工时"],
+      "duties": ["负责 SaaS 产品前端开发", "全远程协作"],
+      "reqDegree": "不限", "reqYears": "3-5年",
+      "reqSkills": ["React", "TypeScript", "英文文档阅读"],
+      "keywords": ["前端", "远程"],
+      "rawJD": "岗位职责：\n1. 全远程负责 SaaS 产品的前端开发；\n2. 用英文与海外团队协作。\n\n任职要求：\n1. 3 年以上前端经验；\n2. 能读写英文技术文档；\n3. 自驱、能独立排期。",
+      "pros": ["全远程", "弹性"], "cons": ["时差协作"], "tags": ["远程"], "risks": [],
+      "status": "applied", "favorite": false, "archived": false,
+      "url": "https://example.com/job/demo-6",
+      "hr": "示例HR6", "hrTitle": "People Ops", "active": "今日活跃",
+      "createdAt": 1766793600000, "updatedAt": 1767225600000
+    }
+  ],
+  "applications": [
+    {
+      "id": "app_demo_1", "jobId": "job_demo_1", "status": "interview",
+      "channel": "BOSS 直聘", "resumeId": "cv_demo_1",
+      "note": "一面已过，等二面安排",
+      "appliedAt": 1767312000000,
+      "timeline": [
+        { "at": 1767312000000, "status": "applied", "note": "创建" },
+        { "at": 1767398400000, "status": "viewed", "note": "HR 已读" },
+        { "at": 1767484800000, "status": "invited", "note": "约一面" },
+        { "at": 1767571200000, "status": "interview", "note": "一面通过" }
+      ],
+      "createdAt": 1767312000000, "updatedAt": 1767571200000
+    },
+    {
+      "id": "app_demo_2", "jobId": "job_demo_6", "status": "applied",
+      "channel": "官网投递", "resumeId": "cv_demo_1",
+      "note": "", "appliedAt": 1767225600000,
+      "timeline": [{ "at": 1767225600000, "status": "applied", "note": "创建" }],
+      "createdAt": 1767225600000, "updatedAt": 1767225600000
+    }
+  ],
+  "interviews": [
+    {
+      "id": "itv_demo_1", "jobId": "job_demo_1", "appId": "app_demo_1",
+      "at": 1767744000000, "mode": "online", "link": "https://example.com/meeting/demo",
+      "place": "", "interviewers": "技术负责人 + HRBP",
+      "round": "二面（技术/业务）", "status": "scheduled", "result": "pending",
+      "notes": "重点问项目架构与性能优化", "review": "",
+      "createdAt": 1767571200000, "updatedAt": 1767571200000
+    }
+  ],
+  "resumes": [
+    {
+      "id": "cv_demo_1", "name": "前端工程师-主投版",
+      "content": "【示例简历，全部虚构】\n\n姓名：示例候选人\n求职意向：前端开发工程师\n\n技能：JavaScript / TypeScript / Vue / React / Node.js\n\n项目经历：\n1. 求职管理工具（个人项目）\n   - 手写 ES5 架构，32 个模块，无框架无构建\n   - 2482 条断言的核心测试\n\n2. 示例业务系统\n   - 负责前端架构与性能优化\n",
+      "tags": ["前端", "主投"], "isDefault": true, "note": "投前端岗用这份",
+      "createdAt": 1766793600000, "updatedAt": 1766793600000
+    }
+  ],
+  "materials": [
+    {
+      "id": "mat_demo_1", "resumeId": "cv_demo_1", "kind": "project",
+      "title": "求职管理工具（个人项目）",
+      "content": "手写 ES5 架构的本地求职管理工具：32 个模块、2482 条断言的核心测试、AI 简历匹配。",
+      "tags": ["前端", "个人项目"],
+      "createdAt": 1766793600000, "updatedAt": 1766793600000
+    }
+  ],
+  "chats": [
+    {
+      "id": "chat_demo_1", "title": "怎么回答「为什么离职」",
+      "messages": [
+        { "role": "user", "text": "怎么回答「为什么离职」？" },
+        { "role": "assistant", "text": "示例回答：\n\n1. 讲客观原因（业务调整/方向变化），不贬低前东家；\n2. 迅速转到「我想做什么」，把话题引回目标岗位；\n3. 给一个具体的、可验证的动机（比如想做更偏前端的工程化）。" }
+      ],
+      "createdAt": 1766880000000, "updatedAt": 1766880000000
+    }
+  ],
+  "checks": [
+    {
+      "id": "chk_demo_1", "key": "示例科技（杭州）有限公司",
+      "company": "示例科技（杭州）有限公司",
+      "reg": { "status": "存续", "establishedAt": "2018-05-01", "capital": 1000000, "paidIn": 1000000 },
+      "risk": { "zhixing": 0, "shixin": 0, "court": 0, "abnormal": 0, "penalty": 0, "labor": 0 },
+      "note": "示例背调记录，全部虚构",
+      "createdAt": 1767225600000, "updatedAt": 1767225600000
+    }
+  ],
+  "conflicts": []
+}

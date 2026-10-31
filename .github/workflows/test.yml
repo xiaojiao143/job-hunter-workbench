@@ -1,0 +1,64 @@
+name: test
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  core-test:
+    name: 核心测试（2482 条断言）
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 语法检查（32 个模块）
+        run: |
+          cd "求职猎手工作台"
+          for f in js/*.js; do
+            node --check "$f" || exit 1
+          done
+          echo "✅ 32 个 js 模块语法通过"
+
+      - name: 跑核心测试
+        run: |
+          cd "求职猎手工作台"
+          node _测试_核心.js
+
+      - name: 校验示例数据可被导入
+        run: |
+          cd "求职猎手工作台"
+          node -e "
+            const fs = require('fs');
+            const o = JSON.parse(fs.readFileSync('demo-data/demo-backup.json', 'utf8'));
+            if (!Array.isArray(o.jobs) || o.jobs.length === 0) throw new Error('demo 数据缺 jobs');
+            if (o._app !== '求职猎手工作台') throw new Error('demo 数据 _app 标识不对');
+            console.log('✅ demo 数据合法：' + o.jobs.length + ' 条岗位');
+          "
+
+  pack-consistency:
+    name: 打包副本一致性闸门
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 校验前端副本与源码一致
+        # sync_src.py 需要 crawler_src/entry.py 存在（仓库里已包含）
+        run: |
+          cd _打包工程
+          python sync_src.py --check
+
+      - name: 服务端双副本语法检查
+        run: |
+          python -m py_compile "求职猎手工作台/采集器/server.py"
+          python -m py_compile "_打包工程/src/server_core.py"
+          echo "✅ 两份 server 语法通过"
