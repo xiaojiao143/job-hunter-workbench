@@ -4,7 +4,7 @@
 >
 > **数据只存在你自己的浏览器里**（localStorage），没有账号、没有云端、没有上传。
 
-[![test](https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名]/actions/workflows/test.yml/badge.svg)](../../actions)
+[![test](https://github.com/xiaojiao143/job-hunter-workbench/actions/workflows/test.yml/badge.svg)](../../actions)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![no build](https://img.shields.io/badge/build-none-brightgreen.svg)](docs/ARCHITECTURE.md)
 [![tests](https://img.shields.io/badge/tests-2470%20assertions-success.svg)](docs/TESTING.md)
@@ -51,7 +51,7 @@
 **唯一前提：一个现代浏览器。** 不需要 Node、不需要 Python、不需要装任何东西。
 
 ```bash
-git clone https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名].git
+git clone https://github.com/xiaojiao143/job-hunter-workbench.git
 ```
 
 然后**双击** `求职猎手工作台/index.html`。
