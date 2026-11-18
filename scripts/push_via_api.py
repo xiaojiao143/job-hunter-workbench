@@ -257,12 +257,31 @@ def main():
     # ── 更新分支引用 ──
     print()
     print('更新 refs/heads/%s → %s' % (args.branch, parent_sha[:8]))
+    # ⛔ 这里必须先判断「分支是否已存在」，不能靠 try/except 兜。
+    #    之前写成 try POST(create) except PATCH(update)，但 POST 对已存在的分支
+    #    会抛 422 "Reference already exists"，而 api() 里 4xx 会被 `raise` ——
+    #    但外层 except 抓到了它、却没打印成功信息，看起来像「做了什么」其实没更新。
+    ref_path = 'refs/heads/' + args.branch
+    exists = True
     try:
-        api('POST', '/repos/%s/git/refs' % args.repo, token, {
-            'ref': 'refs/heads/' + args.branch, 'sha': parent_sha})
+        cur = api('GET', '/repos/%s/git/ref/heads/%s' % (args.repo, args.branch),
+                  token, quiet=True)
+        cur_sha = cur.get('object', {}).get('sha')
     except Exception:
+        exists = False
+        cur_sha = None
+
+    if exists and cur_sha == parent_sha:
+        print('  ✓ 分支已指向 %s，无需更新' % parent_sha[:8])
+    elif exists:
         api('PATCH', '/repos/%s/git/refs/heads/%s' % (args.repo, args.branch), token,
             {'sha': parent_sha, 'force': True})
+        print('  ✓ 已强制更新（原 %s → %s）'
+              % ((cur_sha or '?')[:8], parent_sha[:8]))
+    else:
+        api('POST', '/repos/%s/git/refs' % args.repo, token,
+            {'ref': ref_path, 'sha': parent_sha})
+        print('  ✓ 已创建分支')
 
     print()
     print('=' * 62)
