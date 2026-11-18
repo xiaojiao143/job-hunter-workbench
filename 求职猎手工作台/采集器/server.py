@@ -108,14 +108,65 @@ GREET_LOG_PATH = os.path.join(DATA_DIR, 'greet_log.json')   # 服务端自己记
 STOP_GRACE_SEC = 8.0        # stop 之后最多等这么久，超时就强制把任务落地（见 _stop_watchdog）
 
 # boss-crawler 技能 —— 采集逻辑全在它那儿，这边一行都不重复实现
-SKILL_DIR = r'C:\Users\1\.workbuddy\skills\boss-crawler'
-ASSETS_DIR = os.path.join(SKILL_DIR, 'assets')
-SCRIPTS = os.path.join(SKILL_DIR, 'scripts')
-PIPELINE = os.path.join(SCRIPTS, 'pipeline.py')
+#
+# ⛔ 路径不能写死本机绝对路径（会泄漏作者 Windows 用户名，别人 clone 也跑不了）。
+#   解析顺序：① 环境变量 JH_SKILL_DIR  ② 便携版 exe 旁边
+#            ③ 仓库内 _打包工程/crawler_src  ④ 用户家目录下的 skill 目录
+def _find_skill_dir():
+    env = os.environ.get('JH_SKILL_DIR')
+    if env and os.path.isdir(env):
+        return env
+    here = os.path.dirname(os.path.abspath(__file__))
+    parent = os.path.dirname(here)
+    cands = [
+        os.path.join(parent, '采集组件', 'crawler_src'),      # 便携版布局
+        os.path.join(parent, 'crawler_src'),
+        os.path.join(os.path.dirname(parent), '_打包工程', 'crawler_src'),  # 源码模式
+        os.path.join(parent, '..', '_打包工程', 'crawler_src'),
+    ]
+    home = os.environ.get('USERPROFILE') or os.environ.get('HOME') or ''
+    if home:
+        cands.append(os.path.join(home, '.workbuddy', 'skills', 'boss-crawler'))
+    for c in cands:
+        c = os.path.normpath(c)
+        if os.path.isdir(os.path.join(c, 'scripts')):
+            return c
+    return ''
+
+
+SKILL_DIR = _find_skill_dir()
+# ⚠️ 找不到时下面这些会是空串 —— 采集接口会明确报「采集组件未安装」，
+#    而不是拿一个错路径去执行（那样报错信息很难懂）。
+ASSETS_DIR = os.path.join(SKILL_DIR, 'assets') if SKILL_DIR else ''
+SCRIPTS = os.path.join(SKILL_DIR, 'scripts') if SKILL_DIR else ''
+PIPELINE = os.path.join(SCRIPTS, 'pipeline.py') if SCRIPTS else ''
 
 # 专用 venv。**别换成系统 Python** —— boss-crawler 要 requests 2.34 / lxml 6，
 # 和默认环境里 2020 年那套（requests 2.25）冲突。
-PY = r'C:\Users\1\.workbuddy\binaries\python\envs\boss-crawler\Scripts\python.exe'
+#
+# ⛔ 同样不写死。解析顺序：① JH_PYTHON  ② 用户家目录下的 boss-crawler venv
+#                        ③ 仓库内 .venv  ④ 交给 PATH 的 python
+def _find_python():
+    env = os.environ.get('JH_PYTHON')
+    if env and os.path.exists(env):
+        return env
+    here = os.path.dirname(os.path.abspath(__file__))
+    parent = os.path.dirname(here)
+    home = os.environ.get('USERPROFILE') or os.environ.get('HOME') or ''
+    cands = []
+    if home:
+        base = os.path.join(home, '.workbuddy', 'binaries', 'python', 'envs', 'boss-crawler')
+        cands.append(os.path.join(base, 'Scripts', 'python.exe'))
+        cands.append(os.path.join(base, 'bin', 'python'))
+    cands.append(os.path.join(os.path.dirname(parent), '_打包工程', '.venv', 'Scripts', 'python.exe'))
+    cands.append(os.path.join(parent, '.venv', 'Scripts', 'python.exe'))
+    for c in cands:
+        if c and os.path.exists(c):
+            return c
+    return 'python'      # 兜底：交给 PATH
+
+
+PY = _find_python()
 
 # —— 去 BOSS 投递链路（第 19 轮）——
 # 这两个脚本是**真实对外动作**（一个会发消息、一个会读用户的私人消息），

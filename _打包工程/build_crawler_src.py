@@ -24,7 +24,13 @@ import re
 import shutil
 import sys
 
-SRC_SKILL = r'C:\Users\1\.workbuddy\skills\boss-crawler'
+# ⛔ 采集组件源码的位置不能写死本机绝对路径（会泄漏作者 Windows 用户名，
+#   别人 clone 下来也跑不了）。解析顺序：
+#     ① 环境变量 JH_SKILL_DIR（显式指定）
+#     ② 用户家目录下的 skill 目录（本机老环境）
+_HOME = os.environ.get('USERPROFILE') or os.environ.get('HOME') or ''
+SRC_SKILL = (os.environ.get('JH_SKILL_DIR')
+             or os.path.join(_HOME, '.workbuddy', 'skills', 'boss-crawler'))
 HERE = os.path.dirname(os.path.abspath(__file__))
 DST = os.path.join(HERE, 'crawler_src')
 
