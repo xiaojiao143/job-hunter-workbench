@@ -36,6 +36,62 @@ const PACK_DIR = (function () {
   return '';
 })();
 
+/* 爬虫源码根目录（crawler.py / cli.py / stages/ 所在处）。
+   ⛔ 以前这里是硬编码的 '<本机 skill 目录>'：
+      既泄漏了作者本机的 Windows 用户名，也让别人 clone 下来必然红。
+   现在按以下顺序解析，取第一个真实存在的：
+     ① 环境变量 JH_CRAWLER_DIR（显式指定，最高优先）
+     ② 仓库内自带的 _打包工程/crawler_src（随仓库分发，是 crawl 链路的真实来源）
+     ③ 历史的本机 skill 目录（老环境兜底）
+   都找不到时返回空串，依赖它的断言会显式跳过（见 hasCrawlerSrc）。 */
+const CRAWLER_DIR = (function () {
+  const cands = [
+    process.env.JH_CRAWLER_DIR,
+    PACK_DIR ? path.join(PACK_DIR, 'crawler_src') : '',
+    path.join(DIR, '..', '_打包工程', 'crawler_src'),
+    process.env.USERPROFILE ? path.join(process.env.USERPROFILE, '.workbuddy', 'skills', 'boss-crawler') : '',
+    process.env.HOME ? path.join(process.env.HOME, '.workbuddy', 'skills', 'boss-crawler') : '',
+  ];
+  for (let i = 0; i < cands.length; i++) {
+    const c = cands[i];
+    if (!c) continue;
+    if (fs.existsSync(path.join(c, 'scripts', 'boss_crawler'))) return c;
+  }
+  return '';
+})();
+
+/** 拼一个爬虫源码路径；CRAWLER_DIR 为空时返回一个必然不存在的路径 */
+function crawlerPath(rel) {
+  return path.join(CRAWLER_DIR || path.join(DIR, '__no_crawler__'), rel);
+}
+
+/* Python 解释器路径。
+   ⛔ 以前这里是硬编码的 '<本机 python.exe>'，
+      既泄漏本机用户名，别人机器上也不存在。
+   现在按顺序探测，取第一个真实可用的：
+     ① 环境变量 JH_PYTHON（显式指定）
+     ② 常见 venv 位置（仓库内 / 用户目录）
+     ③ PATH 里的 python / python3
+   都找不到时返回空串 —— 依赖它的断言会显式跳过而不是误报红。 */
+const PY_EXE = (function () {
+  const cands = [process.env.JH_PYTHON];
+  const home = process.env.USERPROFILE || process.env.HOME || '';
+  if (home) {
+    cands.push(path.join(home, '.workbuddy', 'binaries', 'python', 'envs', 'boss-crawler', 'Scripts', 'python.exe'));
+  }
+  cands.push(path.join(DIR, '..', '_打包工程', '.venv', 'Scripts', 'python.exe'));
+  const found = cands.filter(function (c) { return c && fs.existsSync(c); });
+  if (found.length) return found[0];
+  // 退一步：PATH 里有没有
+  const probe = require('child_process').spawnSync(
+    process.platform === 'win32' ? 'where' : 'which', ['python'],
+    { encoding: 'utf8' });
+  if (probe.status === 0 && probe.stdout && probe.stdout.trim()) {
+    return probe.stdout.trim().split(/\r?\n/)[0];
+  }
+  return '';
+})();
+
 /* ======================================================================
    一、DOM / 浏览器环境桩
    ====================================================================== */
@@ -5541,7 +5597,7 @@ withFetch(
     /* ⑤ 服务端 estimate_crawl 的常量必须和 skill 一致（复刻就得防漂移） */
     const srvEst = readText('采集器/server.py');
     const cfgPy = fs.readFileSync(
-      'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/config.py', 'utf8');
+      crawlerPath('scripts/boss_crawler/config.py'), 'utf8');
     const numOf = (s, re) => { const m = s.match(re); return m ? m[1] : null; };
     eq('server 的每页条数与 skill PER_PAGE 一致',
       numOf(srvEst, /_EST_PER_PAGE\s*=\s*(\d+)/), numOf(cfgPy, /^PER_PAGE\s*=\s*(\d+)/m));
@@ -5605,7 +5661,7 @@ withFetch(
       /if value in \(None, \[\], \(\)\):\s*\n\s*value = ''/.test(srvEst));
     /* 空串→清字段 的契约来自 infer_params，这里确认它没被改掉（改了就得同步这里） */
     const ip = fs.readFileSync(
-      'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/infer_params.py', 'utf8');
+      crawlerPath('scripts/stages/infer_params.py'), 'utf8');
     ok('infer_params 仍然「显式传空串 = 不筛这一项」（透传契约的前提）',
       /params\.pop\(field, None\)\s*#\s*显式传空串 = 不筛这一项/.test(ip));
   }
@@ -5754,7 +5810,7 @@ withFetch(
     const vc = readText('js/view-collect.js');
     // 采集内核在 skill 目录（不在本仓库），读不到就按空串处理 —— 断言会因
     // 「找不到」而红，而不是让整个测试崩掉。
-    const SKILL = 'C:/Users/1/.workbuddy/skills/boss-crawler';
+    const SKILL = CRAWLER_DIR;
     const readMaybe = p => { try { return fs.readFileSync(p, 'utf8'); } catch (e) { return ''; } };
     const crawler = readMaybe(SKILL + '/scripts/boss_crawler/crawler.py');
     const cfg = readMaybe(SKILL + '/scripts/boss_crawler/config.py');
@@ -6134,8 +6190,8 @@ withFetch(
   /* --- 18.8M 服务端：打招呼的闸门 + 命令构造（静态查真源，不靠印象） --- */
   {
     const srv = fs.readFileSync(path.join(DIR, '采集器/server.py'), 'utf8');
-    const one = fs.readFileSync('C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/boss_apply_one.py', 'utf8');
-    const chat = fs.readFileSync('C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/boss_chat_sync.py', 'utf8');
+    const one = fs.readFileSync(crawlerPath('scripts/stages/boss_apply_one.py'), 'utf8');
+    const chat = fs.readFileSync(crawlerPath('scripts/stages/boss_chat_sync.py'), 'utf8');
 
     ok('server.py 有 /api/apply-one 路由', /path == '\/api\/apply-one'/.test(srv));
     ok('server.py 有 /api/sync-reply 路由', /path == '\/api\/sync-reply'/.test(srv));
@@ -7972,7 +8028,7 @@ withFetch(
       const SK2 = (function () {
         const cands = [];
         if (PACK_DIR) cands.push(path.join(PACK_DIR, 'crawler_src', 'scripts', 'boss_crawler') + path.sep);
-        cands.push('C:/Users/1/.workbuddy/skills/boss-crawler/scripts/boss_crawler/');
+        if (CRAWLER_DIR) cands.push(crawlerPath('scripts/boss_crawler') + path.sep);
         for (let i = 0; i < cands.length; i++) {
           if (fs.existsSync(path.join(cands[i], 'crawler.py'))) return cands[i];
         }
@@ -8086,8 +8142,7 @@ withFetch(
         '    == out["none"][out["none"].index("--keywords")+1])',
         'open(' + JSON.stringify(tmpOut) + ', "w", encoding="utf-8").write(json.dumps(out, ensure_ascii=False))',
       ].join('\n');
-      const pyExe = fs.existsSync('C:/Users/1/.workbuddy/binaries/python/envs/boss-crawler/Scripts/python.exe')
-        ? 'C:/Users/1/.workbuddy/binaries/python/envs/boss-crawler/Scripts/python.exe' : 'python';
+      const pyExe = PY_EXE || 'python';
       try { fs.unlinkSync(tmpOut); } catch (e) { /* noop */ }
       const fdErr = fs.openSync(tmpErr, 'w');
       try {
@@ -8192,8 +8247,7 @@ withFetch(
         'out["mm_quick"] = srv.match_map(tmp2).get(L1,{}).get("match_score")',
         'json.dump(out, open(' + JSON.stringify(mOut) + ',"w",encoding="utf-8"), ensure_ascii=False)',
       ].join('\n');
-      const pyExe = fs.existsSync('C:/Users/1/.workbuddy/binaries/python/envs/boss-crawler/Scripts/python.exe')
-        ? 'C:/Users/1/.workbuddy/binaries/python/envs/boss-crawler/Scripts/python.exe' : 'python';
+      const pyExe = PY_EXE || 'python';
       try { fs.unlinkSync(mOut); } catch (e) { /* noop */ }
       const fdErr = fs.openSync(mErr, 'w');
       try {
@@ -9306,7 +9360,7 @@ withFetch(
     const vr = rd24('js/view-resume.js');
     const corePy = PACK ? rd24(path.join(PACK, 'src', 'server_core.py')) : '';
     const entryPy = PACK ? rd24(path.join(PACK, 'crawler_src', 'entry.py')) : '';
-    const stagePath = 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts/stages/extract_resume_text.py';
+    const stagePath = crawlerPath('scripts/stages/extract_resume_text.py');
     const stagePy = fs.readFileSync(stagePath, 'utf8');
 
     /* ---- 24.1 前端：accept 真含 PDF / Word（值比对，不是"出现过"）---- */
@@ -9659,8 +9713,7 @@ withFetch(
            所以把 stdout/stderr 一起写进文件，再读回来。 */
         const fd = fs.openSync(probeOut, 'w');
         try {
-          require('child_process').spawnSync(
-            'C:/Users/1/.workbuddy/binaries/python/envs/boss-crawler/Scripts/python.exe',
+          require('child_process').spawnSync(PY_EXE || 'python',
             [probePath, PKG_SCRIPTS], { stdio: ['ignore', fd, fd], timeout: 90000 });
         } finally {
           fs.closeSync(fd);
@@ -9709,7 +9762,7 @@ withFetch(
        ④ 前端默认 own（daily 要求用户先退 Edge，默认开会让第一次用的人以为坏了）
      ================================================================== */
   {
-    const SKILL_SCRIPTS = 'C:/Users/1/.workbuddy/skills/boss-crawler/scripts';
+    const SKILL_SCRIPTS = crawlerPath('scripts');
     const rdSkill = rel => {
       try { return fs.readFileSync(path.join(SKILL_SCRIPTS, rel), 'utf8'); }
       catch (e) { return ''; }
@@ -9868,8 +9921,7 @@ withFetch(
       fs.writeFileSync(pPath, probe, 'utf8');
       const fd = fs.openSync(pOut, 'w');
       try {
-        require('child_process').spawnSync(
-          'C:/Users/1/.workbuddy/binaries/python/envs/boss-crawler/Scripts/python.exe',
+        require('child_process').spawnSync(PY_EXE || 'python',
           [pPath, SKILL_SCRIPTS], { stdio: ['ignore', fd, fd], timeout: 60000 });
       } finally { fs.closeSync(fd); }
       braw = (fs.readFileSync(pOut, 'utf8') || '').trim();
@@ -10421,10 +10473,24 @@ withFetch(
     const PACK_TWIN_PATH = PACK_DIR
       ? path.join(PACK_DIR, 'src', 'server_core.py')
       : path.join(DIR, '..', '_打包工程', 'src', 'server_core.py');
+    /* 与 _回退自证.js 的 CRAWLER_SRC 口径保持一致 —— 那边 MUTATIONS 里的
+       crawlerSrc('...') 就是基于这个根目录拼的。 */
+    const CRAWLER_SRC_FOR_SELF = CRAWLER_DIR
+      || path.join(DIR, '..', '_打包工程', 'crawler_src');
     let muts = null;
     try {
       const m = selfSrc.match(/const MUTATIONS\s*=\s*\[([\s\S]*?)\n\];/);
-      if (m) muts = new Function('PACK_TWIN', 'return [' + m[1] + '];')(PACK_TWIN_PATH);
+      if (m) {
+        /* ⚠️ 沙箱里注入了 `_回退自证.js` 顶层用到的路径解析函数。
+           MUTATIONS 里有些 file 字段是 crawlerSrc('...') 调用而不是字符串字面量，
+           不把这个函数传进来就会 ReferenceError（"crawlerSrc is not defined"）。 */
+        const _selfPathJoin = path.join;
+        const _selfCrawlerSrc = function (rel) {
+          return _selfPathJoin(CRAWLER_SRC_FOR_SELF, rel);
+        };
+        muts = new Function('PACK_TWIN', 'crawlerSrc',
+          'return [' + m[1] + '];')(PACK_TWIN_PATH, _selfCrawlerSrc);
+      }
     } catch (e) {
       ok('能把 _回退自证.js 的 MUTATIONS 解析成数组', false, e.message);
     }
