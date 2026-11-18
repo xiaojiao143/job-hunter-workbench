@@ -36,7 +36,7 @@
 ### 方式 A：用 Git（推荐，方便以后更新）
 
 ```bash
-git clone https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名].git
+git clone https://github.com/xiaojiao143/job-hunter-workbench.git
 ```
 
 ### 方式 B：直接下载压缩包（不想装 Git 就用这个）

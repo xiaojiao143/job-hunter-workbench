@@ -1,13 +1,13 @@
 blank_issues_enabled: false
 contact_links:
   - name: 📖 先看使用手册
-    url: https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名]/blob/master/docs/USAGE.md
+    url: https://github.com/xiaojiao143/job-hunter-workbench/blob/master/docs/USAGE.md
     about: 安装、导入数据、配 AI、常见问题 —— 大部分疑问这里都有答案
 
   - name: 🔒 报告安全问题
-    url: https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名]/security/advisories/new
+    url: https://github.com/xiaojiao143/job-hunter-workbench/security/advisories/new
     about: 请勿公开提交安全 Issue，走这里或直接邮件联系
 
   - name: 💬 聊聊 / 提问
-    url: https://github.com/[待补充：你的GitHub用户名]/[待补充：仓库名]/discussions
+    url: https://github.com/xiaojiao143/job-hunter-workbench/discussions
     about: 不是明确 bug 也不是功能建议的，来这里随便聊
